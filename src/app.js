@@ -10,9 +10,14 @@ const app = express();
 // Environment-based configuration
 const isProduction = process.env.NODE_ENV === 'production';
 const allowedOrigins = [
-  isProduction ? 'https://your-production-frontend-url.com' : 'http://localhost:5173',
+  isProduction ? process.env.PRODUCTION_FRONTEND_URL : process.env.FRONTEND_URL || 'http://localhost:5173',
   // Add other allowed origins as needed
+  'http://localhost:3000', // For local testing
+  'http://127.0.0.1:5173', // Alternative localhost
 ];
+
+// Remove undefined values
+const validOrigins = allowedOrigins.filter(origin => origin && origin !== 'undefined');
 
 // CORS configuration
 app.use(
@@ -20,9 +25,11 @@ app.use(
     origin: (origin, callback) => {
       // Allow requests with no origin (e.g., server-to-server or Postman)
       if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) {
+      if (validOrigins.includes(origin)) {
         callback(null, true);
       } else {
+        console.log('CORS blocked origin:', origin);
+        console.log('Valid origins:', validOrigins);
         callback(new Error('Not allowed by CORS'));
       }
     },
