@@ -10,7 +10,7 @@ const app = express();
 // Environment-based configuration
 const isProduction = process.env.NODE_ENV === 'production';
 const allowedOrigins = [
-  isProduction ? 'https://your-production-frontend-url.com' : 'http://localhost:5173',
+  isProduction ? 'https://code-review-frontend-tau.vercel.app' : 'http://localhost:5173',
   // Add other allowed origins as needed
 ];
 
