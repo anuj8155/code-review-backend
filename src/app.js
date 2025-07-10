@@ -12,9 +12,11 @@ const isProduction = process.env.NODE_ENV === 'production';
 const allowedOrigins = [
   isProduction ? process.env.PRODUCTION_FRONTEND_URL : process.env.FRONTEND_URL || 'http://localhost:5173',
   // Add other allowed origins as needed
-  'http://localhost:3000', // For local testing
+  'http://localhost:3000', // For local testing 
   'http://127.0.0.1:5173', // Alternative localhost
 ];
+console.log(process.env.PRODUCTION_FRONTEND_URL)
+console.log(isProduction ? process.env.PRODUCTION_FRONTEND_URL : process.env.FRONTEND_URL || 'http://localhost:5173');
 
 // Remove undefined values
 const validOrigins = allowedOrigins.filter(origin => origin && origin !== 'undefined');
