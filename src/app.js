@@ -7,39 +7,48 @@ require('dotenv').config();
 
 const app = express();
 
-// Environment-based configuration
-const isProduction = true;
-const allowedOrigins = [
-  isProduction ? process.env.PRODUCTION_FRONTEND_URL : process.env.FRONTEND_URL || 'http://localhost:5173',
-  // Add other allowed origins as needed
-  'http://localhost:3000', // For local testing 
-  'http://127.0.0.1:5173', // Alternative localhost
-];
+// CORS configuration - MUST BE FIRST
+  const allowedOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',')
+    : [process.env.CLIENT_URL, 'http://localhost:5173', 'http://localhost:3000'];
 
-console.log(isProduction ? process.env.PRODUCTION_FRONTEND_URL : process.env.FRONTEND_URL || 'http://localhost:5173');
+  // Log CORS configuration for debugging
+ 
 
-// Remove undefined values
-const validOrigins = allowedOrigins.filter(origin => origin && origin !== 'undefined');
-
-// CORS configuration
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (e.g., server-to-server or Postman)
-      if (!origin) return callback(null, true);
-      if (validOrigins.includes(origin)) {
+console.log('3 Starting server...');
+  app.use(cors({
+    origin: function (origin, callback) {
+      
+      // Allow requests with no origin (like mobile apps or curl requests)
+      if (!origin) {
+        
+        return callback(null, true);
+      }
+      
+      if (allowedOrigins.indexOf(origin) !== -1) {
+       
         callback(null, true);
       } else {
-        console.log('CORS blocked origin:', origin);
-        console.log('Valid origins:', validOrigins);
+        
         callback(new Error('Not allowed by CORS'));
       }
     },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true, // Enable if your frontend sends cookies or auth headers
-  })
-);
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: [
+      'Origin',
+      'X-Requested-With',
+      'Content-Type',
+      'Accept',
+      'Authorization',
+      'Cache-Control',
+      'X-CSRF-Token'
+    ],
+    exposedHeaders: ['Content-Length', 'X-Requested-With'],
+    maxAge: 86400, // 24 hours
+    optionsSuccessStatus: 200,
+    preflightContinue: false,
+  }));
 
 // Security headers
 
